@@ -78,7 +78,7 @@ For security reasons all security related settings are enabled by default.
 // Set a secret password to increase the security of the token
 $csrf->setSalt('secret');
 
-// Set the name of hidden input field
+// Change the name of the hidden input field
 $csrf->setTokenName('__token');
 
 // Enable jQuery ajax protection against CSRF attacks
@@ -123,3 +123,34 @@ Now, the variable `csrf_token` is available in all Twig templates:
     </body>
 </html>
 ```
+
+## What attack does anti-forgery prevent?
+
+Cross-site request forgery (also known as XSRF or CSRF, pronounced see-surf) is an attack against web-hosted applications whereby a malicious web site can influence the interaction between a client browser and a web site that trusts that browser. These attacks are made possible because web browsers send some types of authentication tokens automatically with every request to a web site. This form of exploit is also known as a one-click attack or as session riding, because the attack takes advantage of the user's previously authenticated session.
+
+An example of a CSRF attack:
+
+1. A user logs into www.example.com, using forms authentication.
+2. The server authenticates the user and issues a response that includes an authentication cookie.
+3. The user visits a malicious site.
+4. The malicious site contains an HTML form similar to the following:
+
+```html
+<h1>You Are a Winner!</h1>
+<form action="http://example.com/api/account" method="post">
+    <input type="hidden" name="Transaction" value="withdraw" />
+    <input type="hidden" name="Amount" value="1000000" />
+    <input type="submit" value="Click Me"/>
+</form>
+ ```
+ 
+ Notice that the form action posts to the vulnerable site, not to the malicious site. This is the “cross-site” part of CSRF.
+
+The user clicks the submit button. The browser includes the authentication cookie with the request. The request runs on the server with the user’s authentication context, and can do anything that an authenticated user is allowed to do.
+
+So basically, when example.com receives the CSRF attack it should match the CSRF token in the cookie against the one in the post data, http header or meta tag. A legit request will include both, however, a forgery attack will only include the CSRF token specified in the cookie.
+
+More informations:
+
+* [Robust Defenses for Cross-Site Request Forgery](http://seclab.stanford.edu/websec/csrf/csrf.pdf)
+* [Preventing Cross-Site Request Forgery (XSRF/CSRF) Attacks](https://docs.microsoft.com/en-us/aspnet/core/security/anti-request-forgery)
