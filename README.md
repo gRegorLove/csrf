@@ -167,7 +167,6 @@ More informations:
 
 * [Robust Defenses for Cross-Site Request Forgery](http://seclab.stanford.edu/websec/csrf/csrf.pdf) (pdf)
 * [Preventing Cross-Site Request Forgery (XSRF/CSRF) Attacks](https://docs.microsoft.com/en-us/aspnet/core/security/anti-request-forgery)
-* [](http://php.net/manual/ro/features.session.security.management.php#features.session.security.management.csrf)
 
 ## How does odan/slim-csrf address CSRF?
 
@@ -183,13 +182,15 @@ For example, the following HTML file will automatically generate anti-forgery to
 </form>
 ```
 
-The automatic generation of anti-forgery tokens for HTML form elements happens when:
+Result:
 
-* The form tag contains the `method="post"` attribute `AND`
-* The action attribute is empty. ( action="") `OR`
-* The action attribute is not supplied. (`<form method="post">`)
-    
-    
+```html
+<form method="post">
+   <input type="hidden" name="__token" value="the-csrf-token">
+  <!-- form markup -->
+</form>
+```
+
 You can disable automatic generation of anti-forgery tokens for HTML form elements by:
 
 ```php
