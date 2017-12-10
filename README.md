@@ -144,13 +144,95 @@ An example of a CSRF attack:
 </form>
  ```
  
- Notice that the form action posts to the vulnerable site, not to the malicious site. This is the “cross-site” part of CSRF.
+Notice that the form action posts to the vulnerable site, not to the malicious site. This is the “cross-site” part of CSRF.
 
 The user clicks the submit button. The browser includes the authentication cookie with the request. The request runs on the server with the user’s authentication context, and can do anything that an authenticated user is allowed to do.
 
 So basically, when example.com receives the CSRF attack it should match the CSRF token in the cookie against the one in the post data, http header or meta tag. A legit request will include both, however, a forgery attack will only include the CSRF token specified in the cookie.
 
+Session and authentication does not protect against CSRF attack. Developers must implement CSRF protection by themselves.
+
+Using SSL does not prevent a CSRF attack, the malicious site can send an `https://` request.
+
+Note: This library does not protect your applications that change state with `GET` requests and is therefore vulnerable to such malicious attacks.
+
+Users can guard against CSRF vulnerabilities by:
+
+* Logging off of web sites when they have finished using them.
+* Clearing their browser's cookies periodically.
+
+However, CSRF vulnerabilities are fundamentally a problem with the web app, not the end user.
+
 More informations:
 
-* [Robust Defenses for Cross-Site Request Forgery](http://seclab.stanford.edu/websec/csrf/csrf.pdf)
+* [Robust Defenses for Cross-Site Request Forgery](http://seclab.stanford.edu/websec/csrf/csrf.pdf) (pdf)
 * [Preventing Cross-Site Request Forgery (XSRF/CSRF) Attacks](https://docs.microsoft.com/en-us/aspnet/core/security/anti-request-forgery)
+* [](http://php.net/manual/ro/features.session.security.management.php#features.session.security.management.csrf)
+
+## How does odan/slim-csrf address CSRF?
+
+### HTML forms
+
+The middleware injects anti-forgery tokens for HTML form elements.
+
+For example, the following HTML file will automatically generate anti-forgery tokens:
+
+```html
+<form method="post">
+  <!-- form markup -->
+</form>
+```
+
+The automatic generation of anti-forgery tokens for HTML form elements happens when:
+
+* The form tag contains the `method="post"` attribute `AND`
+* The action attribute is empty. ( action="") `OR`
+* The action attribute is not supplied. (`<form method="post">`)
+    
+    
+You can disable automatic generation of anti-forgery tokens for HTML form elements by:
+
+```php
+$csrf->protectForms(false);
+```
+
+### JavaScript, AJAX, and SPAs
+
+In traditional HTML-based applications, antiforgery tokens are passed to the server using hidden form fields. In modern JavaScript-based apps and single page applications (SPAs), many requests are made programmatically. These AJAX requests may use other techniques (such as request headers or cookies) to send the token. If cookies are used to store authentication tokens and to authenticate API requests on the server, then CSRF will be a potential problem. However, if local storage is used to store the token, CSRF vulnerability may be mitigated, since values from local storage are not sent automatically to the server with every new request. Thus, using local storage to store the antiforgery token on the client and sending the token as a request header is a recommended approach.
+
+### JQuery
+
+The middleware injecte a small piece of JavaScript into your html template to protect all jQuery Ajax request against CSRS attacks.
+
+The default header name is: `X-CSRF-TOKEN` (compatible with Angular)
+
+For example, the following HTML file will automatically generate anti-forgery tokens:
+
+```html
+<!DOCTYPE html>
+    <head>
+       <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    </head>
+    <body>
+    </body>
+</html>
+```
+
+Result:
+
+```html
+<!DOCTYPE html>
+    <head>
+       <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    </head>
+    <body>
+    <script>$.ajaxSetup({beforeSend: function (xhr) { xhr.setRequestHeader("X-CSRF-Token","the-csrf-token"); }});</script>
+    </body>
+</html>
+```
+
+You can disable automatic generation of anti-forgery tokens for HTML documents by:
+
+```php
+$csrf->protectjQueryAjax(false);
+```
