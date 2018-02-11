@@ -243,7 +243,7 @@ final class CsrfMiddleware
      * @param string $tokenValue
      * @return string
      */
-    public function injectJqueryToResponse(string $body, string $tokenValue)
+    public function injectJqueryToResponse(string $body, string $tokenValue): string
     {
         $regex = '/(.*?)(<\/body>)/is';
         $jQueryCode = sprintf('<script>$.ajaxSetup({beforeSend: function (xhr) { xhr.setRequestHeader("X-CSRF-Token","%s"); }});</script>', $tokenValue);
