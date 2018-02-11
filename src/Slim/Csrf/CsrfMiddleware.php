@@ -148,9 +148,8 @@ final class CsrfMiddleware
     {
         if (!empty($this->token)) {
             return $this->token;
-        } else {
-            return hash('sha256', $this->sessionId . $this->salt);
         }
+        return hash('sha256', $this->sessionId . $this->salt);
     }
 
     /**

@@ -13,6 +13,7 @@ abstract class AbstractTest extends TestCase
 
     /**
      * @return CsrfMiddleware
+     * @param mixed $sessionId
      */
     public function newInstance($sessionId = 'sessionid')
     {
