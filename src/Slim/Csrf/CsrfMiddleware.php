@@ -121,7 +121,7 @@ final class CsrfMiddleware
      *
      * @param Request $request
      * @param Response $response
-     * @param $next
+     * @param callable $next
      * @return Response
      */
     public function __invoke(Request $request, Response $response, $next): Response
@@ -191,15 +191,15 @@ final class CsrfMiddleware
      * Inject token to response object.
      *
      * @param Response $response
-     * @param $tokenValue
-     * @return Response|static
+     * @param string $tokenValue
+     * @return Response
      */
-    private function injectTokenToResponse(Response $response, $tokenValue)
+    private function injectTokenToResponse(Response $response, string $tokenValue)
     {
         // Check if response is html
-        $contenTypes = $response->getHeader('content-type');
-        $contenType = reset($contenTypes);
-        if (strpos($contenType, 'text/html') === false) {
+        $contentTypes = $response->getHeader('content-type');
+        $contentType = reset($contentTypes);
+        if (strpos($contentType, 'text/html') === false) {
             return $response;
         }
 
@@ -225,15 +225,15 @@ final class CsrfMiddleware
      *
      * @param string $body
      * @param string $tokenValue
-     * @return null|string|string[]
+     * @return string
      */
-    public function injectFormHiddenFieldToResponse(string $body, string $tokenValue)
+    public function injectFormHiddenFieldToResponse(string $body, string $tokenValue): string
     {
         $regex = '/(<form\b[^>]*>)(.*?)(<\/form>)/is';
         $htmlHiddenField = sprintf('$1<input type="hidden" name="%s" value="%s">$2$3', $this->name, $tokenValue);
         $body = preg_replace($regex, $htmlHiddenField, $body);
 
-        return $body;
+        return (string)$body;
     }
 
     /**
