@@ -11,7 +11,7 @@
 ## Installation
 
 ```
-composer install odan/slim-csrf
+composer require odan/slim-csrf
 ```
 
 ## Integration
@@ -50,7 +50,7 @@ $container[\Odan\Slim\Csrf\CsrfMiddleware::class] = function (Container $contain
     $session = $container->get(\Aura\Session\Session::class);
     $token = $session->getCsrfToken()->getValue();
     $sessionId = $session->getId();
-    $csrf = new \App\Middleware\CsrfMiddleware($sessionId);
+    $csrf = new \Odan\Slim\Csrf\CsrfMiddleware($sessionId);
 
     // Use the token from the aura session object
     $csrf->setToken($token);
