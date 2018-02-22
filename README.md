@@ -201,9 +201,9 @@ $csrf->protectForms(false);
 
 In traditional HTML-based applications, antiforgery tokens are passed to the server using hidden form fields. In modern JavaScript-based apps and single page applications (SPAs), many requests are made programmatically. These AJAX requests may use other techniques (such as request headers or cookies) to send the token. If cookies are used to store authentication tokens and to authenticate API requests on the server, then CSRF will be a potential problem. However, if local storage is used to store the token, CSRF vulnerability may be mitigated, since values from local storage are not sent automatically to the server with every new request. Thus, using local storage to store the antiforgery token on the client and sending the token as a request header is a recommended approach.
 
-### JQuery
+### jQuery
 
-The middleware injecte a small piece of JavaScript into your html template to protect all jQuery Ajax request against CSRS attacks.
+The middleware injects a small piece of JavaScript into your html template to protect all jQuery Ajax request against CSRS attacks.
 
 The default header name is: `X-CSRF-TOKEN` (compatible with Angular)
 
@@ -232,7 +232,7 @@ Result:
 </html>
 ```
 
-You can disable automatic generation of anti-forgery tokens for HTML documents by:
+You can disable automatic generation of anti-forgery tokens for HTML documents by calling:
 
 ```php
 $csrf->protectjQueryAjax(false);
