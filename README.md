@@ -86,6 +86,9 @@ $csrf->protectJqueryAjax(true);
 
 // Enable form protection against CSRF attacks
 $csrf->protectForms(true);
+
+// Enable form protection against CSRF attacks, but disable GET forms from protection
+$csrf->protectForms(true, false);
 ```
 
 ## Rendering the CSRF field in Twig
