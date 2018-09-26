@@ -40,6 +40,11 @@ final class CsrfMiddleware
     /**
      * @var bool
      */
+    private $protectGetForms = true;
+
+    /**
+     * @var bool
+     */
     private $protectJqueryAjax = true;
 
     /**
@@ -99,11 +104,13 @@ final class CsrfMiddleware
     /**
      * Enable automatic form protection.
      *
-     * @param bool $enabled
+     * @param bool $enabled Enabled or disabled
+     * @param bool $protectGetForms Default is true
      */
-    public function protectForms(bool $enabled)
+    public function protectForms(bool $enabled, bool $protectGetForms = true)
     {
         $this->protectForms = $enabled;
+        $this->protectGetForms = $enabled && $protectGetForms;
     }
 
     /**
@@ -231,9 +238,18 @@ final class CsrfMiddleware
     {
         $regex = '/(<form\b[^>]*>)(.*?)(<\/form>)/is';
         $htmlHiddenField = sprintf('$1<input type="hidden" name="%s" value="%s">$2$3', $this->name, $tokenValue);
-        $body = preg_replace($regex, $htmlHiddenField, $body);
 
-        return (string)$body;
+        return (string)preg_replace_callback($regex, function ($matches) use ($regex, $htmlHiddenField) {
+            $body = $matches[0];
+
+            if (!$this->protectGetForms && stripos($matches[1], 'method="get"') !== false) {
+                // don't change a GET form
+                return $body;
+            }
+
+            // default injection
+            return preg_replace($regex, $htmlHiddenField, $body);
+        }, $body);
     }
 
     /**
@@ -246,7 +262,8 @@ final class CsrfMiddleware
     public function injectJqueryToResponse(string $body, string $tokenValue): string
     {
         $regex = '/(.*?)(<\/body>)/is';
-        $jQueryCode = sprintf('<script>$.ajaxSetup({beforeSend: function (xhr) { xhr.setRequestHeader("X-CSRF-Token","%s"); }});</script>', $tokenValue);
+        $jQueryCode = sprintf('<script>$.ajaxSetup({beforeSend: function (xhr) { xhr.setRequestHeader("X-CSRF-Token","%s"); }});</script>',
+            $tokenValue);
         $body = (string)preg_replace($regex, '$1' . $jQueryCode . '$2', $body, -1, $count);
 
         if (!$count) {
