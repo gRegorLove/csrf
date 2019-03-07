@@ -1,4 +1,4 @@
-# Slim 3 CSRF protection middleware
+# CSRF protection middleware for Slim 3
 
 [![Latest Version on Packagist](https://img.shields.io/github/release/odan/slim-csrf.svg)](https://github.com/odan/slim-csrf/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
@@ -7,6 +7,7 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odan/slim-csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odan/slim-csrf/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/odan/slim-csrf.svg)](https://packagist.org/packages/odan/slim-csrf)
 
+**Notice:** This package is intended for users of the Slim Framework BUT it has absolutely nothing to do with the Slim Framework.
 
 ## Installation
 
