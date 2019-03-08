@@ -1,17 +1,17 @@
 {
-  "name": "odan/slim-csrf",
+  "name": "odan/csrf",
   "type": "library",
-  "description": "A Slim 3 CSRF protection middleware",
+  "description": "A CSRF protection middleware",
   "keywords": [
-    "slim",
     "csrf",
     "guard",
     "anti forgery",
     "token",
+    "slim",
     "aura",
     "session"
   ],
-  "homepage": "https://github.com/odan/slim-csrf",
+  "homepage": "https://github.com/odan/csrf",
   "license": "MIT",
   "authors": [
     {
