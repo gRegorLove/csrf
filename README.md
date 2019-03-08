@@ -1,35 +1,31 @@
-# A CSRF protection middleware
+# Slim 3 CSRF protection middleware
 
-[![Latest Version on Packagist](https://img.shields.io/github/release/odan/csrf.svg)](https://github.com/odan/csrf/releases)
+[![Latest Version on Packagist](https://img.shields.io/github/release/odan/slim-csrf.svg)](https://github.com/odan/slim-csrf/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
-[![Build Status](https://travis-ci.org/odan/csrf.svg?branch=master)](https://travis-ci.org/odan/csrf)
-[![Code Coverage](https://scrutinizer-ci.com/g/odan/csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odan/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/?branch=master)
-[![Total Downloads](https://img.shields.io/packagist/dt/odan/csrf.svg)](https://packagist.org/packages/odan/csrf)
+[![Build Status](https://travis-ci.org/odan/slim-csrf.svg?branch=master)](https://travis-ci.org/odan/slim-csrf)
+[![Code Coverage](https://scrutinizer-ci.com/g/odan/slim-csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/odan/slim-csrf/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odan/slim-csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odan/slim-csrf/?branch=master)
+[![Total Downloads](https://img.shields.io/packagist/dt/odan/slim-csrf.svg)](https://packagist.org/packages/odan/slim-csrf)
 
-## Requirements
-
-* PHP 7.2+
+**Notice:** This package is intended for users of the Slim Framework BUT it has absolutely nothing to do with the Slim Framework.
 
 ## Installation
 
 ```
-composer install odan/-csrf
+composer require odan/slim-csrf
 ```
 
 ## Integration
 
-### Slim 3 integration
-
-#### Register the middleware
+### Register the middleware
 
 In your `config/container.php` or wherever you add your service factories:
 
 ```php
-$container[\Odan\Csrf\CsrfMiddleware::class] = function (Container $container) {
+$container[\Odan\Slim\Csrf\CsrfMiddleware::class] = function (Container $container) {
     // get the current session id
     $sessionId = session_id();
-    return new \Odan\Csrf\CsrfMiddleware($sessionId);
+    return new \Odan\Slim\Csrf\CsrfMiddleware($sessionId);
 };
 ```
 
@@ -39,7 +35,7 @@ Add the middleware in `config/middleware.php`.
 // Csrf protection middleware
 $app->add(function (Request $request, Response $response, $next) {
     /* @var \Slim\Container $this */
-    $csrf = $this->get(\Odan\Csrf\CsrfMiddleware::class);
+    $csrf = $this->get(\Odan\Slim\Csrf\CsrfMiddleware::class);
     return $csrf->__invoke($request, $response, $next);
 });
 ```
@@ -51,13 +47,11 @@ If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Sess
 In your `config/container.php` or wherever you add your service factories:
 
 ```php
-$container[\Odan\Csrf\CsrfMiddleware::class] = function (Container $container) {
+$container[\Odan\Slim\Csrf\CsrfMiddleware::class] = function (Container $container) {
     $session = $container->get(\Aura\Session\Session::class);
     $token = $session->getCsrfToken()->getValue();
     $sessionId = $session->getId();
-    
-    $csrf = new \App\Middleware\CsrfMiddleware();
-    $csrf->setSessionId($sessionId);
+    $csrf = new \App\Middleware\CsrfMiddleware($sessionId);
 
     // Use the token from the aura session object
     $csrf->setToken($token);
@@ -72,7 +66,7 @@ Add the middleware in `config/middleware.php`.
 // Csrf protection middleware
 $app->add(function (Request $request, Response $response, $next) {
     /* @var \Slim\Container $this */
-    $csrf = $this->get(\Odan\Csrf\CsrfMiddleware::class);
+    $csrf = $this->get(\Odan\Slim\Csrf\CsrfMiddleware::class);
     return $csrf->__invoke($request, $response, $next);
 });
 ```
@@ -93,6 +87,9 @@ $csrf->protectJqueryAjax(true);
 
 // Enable form protection against CSRF attacks
 $csrf->protectForms(true);
+
+// Enable form protection against CSRF attacks, but disable GET forms from protection
+$csrf->protectForms(true, false);
 ```
 
 ## Rendering the CSRF field in Twig
@@ -107,7 +104,7 @@ $container['view'] = function ($c) {
     ]);
     
     // Add a global twig variable
-    $csrfToken = $c->get(\Odan\Csrf\CsrfMiddleware::class)->getToken();
+    $csrfToken = $c->get(\Odan\Slim\Csrf\CsrfMiddleware::class)->getToken();
     $view->getEnvironment()->addGlobal('csrf_token', $csrfToken);
     
     // Instantiate and add Slim specific extension
@@ -175,7 +172,7 @@ More informations:
 * [Robust Defenses for Cross-Site Request Forgery](http://seclab.stanford.edu/websec/csrf/csrf.pdf) (pdf)
 * [Preventing Cross-Site Request Forgery (XSRF/CSRF) Attacks](https://docs.microsoft.com/en-us/aspnet/core/security/anti-request-forgery)
 
-## How does odan/csrf address CSRF?
+## How does odan/slim-csrf address CSRF?
 
 ### HTML forms
 
@@ -208,9 +205,9 @@ $csrf->protectForms(false);
 
 In traditional HTML-based applications, antiforgery tokens are passed to the server using hidden form fields. In modern JavaScript-based apps and single page applications (SPAs), many requests are made programmatically. These AJAX requests may use other techniques (such as request headers or cookies) to send the token. If cookies are used to store authentication tokens and to authenticate API requests on the server, then CSRF will be a potential problem. However, if local storage is used to store the token, CSRF vulnerability may be mitigated, since values from local storage are not sent automatically to the server with every new request. Thus, using local storage to store the antiforgery token on the client and sending the token as a request header is a recommended approach.
 
-### JQuery
+### jQuery
 
-The middleware injecte a small piece of JavaScript into your html template to protect all jQuery Ajax request against CSRS attacks.
+The middleware injects a small piece of JavaScript into your html template to protect all jQuery Ajax request against CSRS attacks.
 
 The default header name is: `X-CSRF-TOKEN` (compatible with Angular)
 
@@ -239,7 +236,7 @@ Result:
 </html>
 ```
 
-You can disable automatic generation of anti-forgery tokens for HTML documents by:
+You can disable automatic generation of anti-forgery tokens for HTML documents by calling:
 
 ```php
 $csrf->protectjQueryAjax(false);
