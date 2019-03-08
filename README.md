@@ -245,3 +245,7 @@ You can disable automatic generation of anti-forgery tokens for HTML documents b
 ```php
 $csrf->protectjQueryAjax(false);
 ```
+
+## Similar packages
+
+* https://github.com/slimphp/Slim-Csrf
