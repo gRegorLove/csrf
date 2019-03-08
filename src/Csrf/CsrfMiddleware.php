@@ -1,6 +1,6 @@
 <?php
 
-namespace Odan\Slim\Csrf;
+namespace Odan\Csrf;
 
 use RuntimeException;
 use Slim\Http\Request;
@@ -8,7 +8,7 @@ use Slim\Http\Response;
 use Slim\Http\Stream;
 
 /**
- * CSRF protection middleware
+ * CSRF protection middleware.
  */
 final class CsrfMiddleware
 {
@@ -43,21 +43,23 @@ final class CsrfMiddleware
     private $protectJqueryAjax = true;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param string $sessionId
+     * @param string|null $sessionId the session id
      */
-    public function __construct(string $sessionId)
+    public function __construct(string $sessionId = null)
     {
-        $this->setSessionId($sessionId);
+        if (!empty($sessionId)) {
+            $this->setSessionId($sessionId);
+        }
     }
 
     /**
      * Set session id.
      *
-     * @param string $sessionId
+     * @param string $sessionId the session id
      */
-    public function setSessionId(string $sessionId)
+    public function setSessionId(string $sessionId): void
     {
         if (empty($sessionId)) {
             throw new RuntimeException('CSRF middleware failed. SessionId not found!');
@@ -69,9 +71,11 @@ final class CsrfMiddleware
     /**
      * Set salt.
      *
-     * @param string $salt
+     * @param string $salt the salt
+     *
+     * @return void
      */
-    public function setSalt(string $salt)
+    public function setSalt(string $salt): void
     {
         $this->salt = $salt;
     }
@@ -80,8 +84,10 @@ final class CsrfMiddleware
      * Set token manually.
      *
      * @param string $token
+     *
+     * @return void
      */
-    public function setToken(string $token)
+    public function setToken(string $token): void
     {
         $this->token = $token;
     }
@@ -90,6 +96,8 @@ final class CsrfMiddleware
      * Set token name.
      *
      * @param string $name
+     *
+     * @return void
      */
     public function setTokenName(string $name)
     {
@@ -100,8 +108,10 @@ final class CsrfMiddleware
      * Enable automatic form protection.
      *
      * @param bool $enabled
+     *
+     * @return void
      */
-    public function protectForms(bool $enabled)
+    public function protectForms(bool $enabled): void
     {
         $this->protectForms = $enabled;
     }
@@ -110,19 +120,22 @@ final class CsrfMiddleware
      * Enable automatic jQuery ajax requests.
      *
      * @param bool $enabled
+     *
+     * @return void
      */
-    public function protectJqueryAjax(bool $enabled)
+    public function protectJqueryAjax(bool $enabled): void
     {
         $this->protectJqueryAjax = $enabled;
     }
 
     /**
-     * Invoke
+     * Invoke.
      *
-     * @param Request $request
-     * @param Response $response
-     * @param callable $next
-     * @return Response
+     * @param Request $request the request
+     * @param Response $response the response
+     * @param callable $next next callback
+     *
+     * @return Response the response
      */
     public function __invoke(Request $request, Response $response, $next): Response
     {
@@ -140,15 +153,16 @@ final class CsrfMiddleware
     }
 
     /**
-     * Get CSRF token
+     * Get CSRF token.
      *
-     * @return string
+     * @return string the token
      */
-    public function getToken()
+    public function getToken(): string
     {
         if (!empty($this->token)) {
             return $this->token;
         }
+
         return hash('sha256', $this->sessionId . $this->salt);
     }
 
@@ -156,11 +170,13 @@ final class CsrfMiddleware
      * Validate token.
      *
      * @param Request $request
-     * @param string $tokenValue
-     * @return bool Status
+     * @param string $tokenValue tokenValue
+     *
      * @throws RuntimeException If invalid token is given
+     *
+     * @return bool Success
      */
-    public function validate(Request $request, string $tokenValue)
+    public function validate(Request $request, string $tokenValue): bool
     {
         // Validate POST, PUT, DELETE, PATCH requests
         $method = $request->getMethod();
@@ -190,31 +206,39 @@ final class CsrfMiddleware
     /**
      * Inject token to response object.
      *
-     * @param Response $response
-     * @param string $tokenValue
-     * @return Response
+     * @param Response $response the response
+     * @param string $tokenValue token value
+     *
+     * @throws RuntimeException
+     *
+     * @return Response the response
      */
-    private function injectTokenToResponse(Response $response, string $tokenValue)
+    private function injectTokenToResponse(Response $response, string $tokenValue): Response
     {
         // Check if response is html
         $contentTypes = $response->getHeader('content-type');
-        $contentType = reset($contentTypes);
+        $contentType = reset($contentTypes) ?: '';
         if (strpos($contentType, 'text/html') === false) {
             return $response;
         }
 
-        $body = $response->getBody()->__toString();
+        $content = $response->getBody()->__toString();
 
         if ($this->protectForms) {
-            $body = $this->injectFormHiddenFieldToResponse($body, $tokenValue);
+            $content = $this->injectFormHiddenFieldToResponse($content, $tokenValue);
         }
 
         if ($this->protectJqueryAjax) {
-            $body = $this->injectJqueryToResponse($body, $tokenValue);
+            $content = $this->injectJqueryToResponse($content, $tokenValue);
         }
 
         $stream = fopen('php://memory', 'r+');
-        fwrite($stream, $body);
+
+        if ($stream === false) {
+            throw new RuntimeException('Creating memory stream failed');
+        }
+
+        fwrite($stream, $content);
         rewind($stream);
 
         return $response->withBody(new Stream($stream));
@@ -223,9 +247,10 @@ final class CsrfMiddleware
     /**
      * Inject hidden field.
      *
-     * @param string $body
-     * @param string $tokenValue
-     * @return string
+     * @param string $body body
+     * @param string $tokenValue token
+     *
+     * @return string html
      */
     public function injectFormHiddenFieldToResponse(string $body, string $tokenValue): string
     {
@@ -239,19 +264,23 @@ final class CsrfMiddleware
     /**
      * Inject jquery code.
      *
-     * @param string $body
-     * @param string $tokenValue
-     * @return string
+     * @param string $body body data
+     * @param string $tokenValue token value
+     *
+     * @return string html
      */
     public function injectJqueryToResponse(string $body, string $tokenValue): string
     {
         $regex = '/(.*?)(<\/body>)/is';
-        $jQueryCode = sprintf('<script>$.ajaxSetup({beforeSend: function (xhr) { xhr.setRequestHeader("X-CSRF-Token","%s"); }});</script>', $tokenValue);
-        $body = (string)preg_replace($regex, '$1' . $jQueryCode . '$2', $body, -1, $count);
+        $jQueryCode = sprintf(
+            '<script>$.ajaxSetup({beforeSend: function (xhr) { xhr.setRequestHeader("X-CSRF-Token","%s"); }});</script>',
+            $tokenValue
+        );
+        $body = preg_replace($regex, '$1' . $jQueryCode . '$2', $body, -1, $count) ?? '';
 
         if (!$count) {
             // Inject JS code anyway
-            $body = $body . $jQueryCode;
+            $body .= $jQueryCode;
         }
 
         return $body;

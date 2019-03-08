@@ -1,30 +1,35 @@
-# Slim 3 CSRF protection middleware
+# A CSRF protection middleware
 
-[![Latest Version on Packagist](https://img.shields.io/github/release/odan/slim-csrf.svg)](https://github.com/odan/slim-csrf/releases)
+[![Latest Version on Packagist](https://img.shields.io/github/release/odan/csrf.svg)](https://github.com/odan/csrf/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
-[![Build Status](https://travis-ci.org/odan/slim-csrf.svg?branch=master)](https://travis-ci.org/odan/slim-csrf)
-[![Code Coverage](https://scrutinizer-ci.com/g/odan/slim-csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/odan/slim-csrf/?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odan/slim-csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odan/slim-csrf/?branch=master)
-[![Total Downloads](https://img.shields.io/packagist/dt/odan/slim-csrf.svg)](https://packagist.org/packages/odan/slim-csrf)
+[![Build Status](https://travis-ci.org/odan/csrf.svg?branch=master)](https://travis-ci.org/odan/csrf)
+[![Code Coverage](https://scrutinizer-ci.com/g/odan/csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odan/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/?branch=master)
+[![Total Downloads](https://img.shields.io/packagist/dt/odan/csrf.svg)](https://packagist.org/packages/odan/csrf)
 
+## Requirements
+
+* PHP 7.2+
 
 ## Installation
 
 ```
-composer install odan/slim-csrf
+composer install odan/-csrf
 ```
 
 ## Integration
 
-### Register the middleware
+### Slim 3 integration
+
+#### Register the middleware
 
 In your `config/container.php` or wherever you add your service factories:
 
 ```php
-$container[\Odan\Slim\Csrf\CsrfMiddleware::class] = function (Container $container) {
+$container[\Odan\Csrf\CsrfMiddleware::class] = function (Container $container) {
     // get the current session id
     $sessionId = session_id();
-    return new \Odan\Slim\Csrf\CsrfMiddleware($sessionId);
+    return new \Odan\Csrf\CsrfMiddleware($sessionId);
 };
 ```
 
@@ -34,7 +39,7 @@ Add the middleware in `config/middleware.php`.
 // Csrf protection middleware
 $app->add(function (Request $request, Response $response, $next) {
     /* @var \Slim\Container $this */
-    $csrf = $this->get(\Odan\Slim\Csrf\CsrfMiddleware::class);
+    $csrf = $this->get(\Odan\Csrf\CsrfMiddleware::class);
     return $csrf->__invoke($request, $response, $next);
 });
 ```
@@ -46,11 +51,13 @@ If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Sess
 In your `config/container.php` or wherever you add your service factories:
 
 ```php
-$container[\Odan\Slim\Csrf\CsrfMiddleware::class] = function (Container $container) {
+$container[\Odan\Csrf\CsrfMiddleware::class] = function (Container $container) {
     $session = $container->get(\Aura\Session\Session::class);
     $token = $session->getCsrfToken()->getValue();
     $sessionId = $session->getId();
-    $csrf = new \App\Middleware\CsrfMiddleware($sessionId);
+    
+    $csrf = new \App\Middleware\CsrfMiddleware();
+    $csrf->setSessionId($sessionId);
 
     // Use the token from the aura session object
     $csrf->setToken($token);
@@ -65,7 +72,7 @@ Add the middleware in `config/middleware.php`.
 // Csrf protection middleware
 $app->add(function (Request $request, Response $response, $next) {
     /* @var \Slim\Container $this */
-    $csrf = $this->get(\Odan\Slim\Csrf\CsrfMiddleware::class);
+    $csrf = $this->get(\Odan\Csrf\CsrfMiddleware::class);
     return $csrf->__invoke($request, $response, $next);
 });
 ```
@@ -100,7 +107,7 @@ $container['view'] = function ($c) {
     ]);
     
     // Add a global twig variable
-    $csrfToken = $c->get(\Odan\Slim\Csrf\CsrfMiddleware::class)->getToken();
+    $csrfToken = $c->get(\Odan\Csrf\CsrfMiddleware::class)->getToken();
     $view->getEnvironment()->addGlobal('csrf_token', $csrfToken);
     
     // Instantiate and add Slim specific extension
@@ -168,7 +175,7 @@ More informations:
 * [Robust Defenses for Cross-Site Request Forgery](http://seclab.stanford.edu/websec/csrf/csrf.pdf) (pdf)
 * [Preventing Cross-Site Request Forgery (XSRF/CSRF) Attacks](https://docs.microsoft.com/en-us/aspnet/core/security/anti-request-forgery)
 
-## How does odan/slim-csrf address CSRF?
+## How does odan/csrf address CSRF?
 
 ### HTML forms
 

@@ -2,18 +2,18 @@
 
 namespace Odan\Test;
 
-use Odan\Slim\Csrf\CsrfMiddleware;
+use Odan\Csrf\CsrfMiddleware;
 use PHPUnit\Framework\TestCase;
 
 /**
- * BaseTest
+ * BaseTest.
  */
 abstract class AbstractTest extends TestCase
 {
-
     /**
-     * @return CsrfMiddleware
      * @param mixed $sessionId
+     *
+     * @return CsrfMiddleware
      */
     public function newInstance($sessionId = 'sessionid')
     {

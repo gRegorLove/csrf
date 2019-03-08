@@ -2,16 +2,15 @@
 
 namespace Odan\Test;
 
-use Odan\Slim\Csrf\CsrfMiddleware;
+use Odan\Csrf\CsrfMiddleware;
 
 /**
- * AssetCacheTest
+ * AssetCacheTest.
  *
- * @coversDefaultClass \Odan\Slim\Csrf\CsrfMiddleware
+ * @coversDefaultClass \Odan\Csrf\CsrfMiddleware
  */
 class CsrfMiddlewareTest extends AbstractTest
 {
-
     /**
      * Test create object.
      *
@@ -19,7 +18,7 @@ class CsrfMiddlewareTest extends AbstractTest
      * @covers ::__construct
      * @covers ::setSessionId
      */
-    public function testInstance()
+    public function testInstance(): void
     {
         $middleware = $this->newInstance('session');
         $this->assertInstanceOf(CsrfMiddleware::class, $middleware);
@@ -31,10 +30,10 @@ class CsrfMiddlewareTest extends AbstractTest
      * @return void
      * @covers ::__construct
      * @covers ::setSessionId
-     * @expectedException \RuntimeException
      */
-    public function testInstanceError()
+    public function testInstanceError(): void
     {
+        $this->expectException(\RuntimeException::class);
         $this->newInstance('');
     }
 }
