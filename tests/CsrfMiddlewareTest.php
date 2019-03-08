@@ -34,6 +34,6 @@ class CsrfMiddlewareTest extends AbstractTest
     public function testInstanceError(): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->newInstance('');
+        $this->newInstance()->setSessionId('');
     }
 }
