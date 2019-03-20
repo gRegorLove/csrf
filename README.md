@@ -33,7 +33,7 @@ $container[CsrfMiddleware::class] = function () {
 };
 ```
 
-Add the middleware in `config/middleware.php`.
+Add the middleware to the routes and route groups you want to protect:
 
 ```php
 // Csrf protection middleware
