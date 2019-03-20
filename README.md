@@ -26,8 +26,10 @@ composer require odan/csrf
 In your `config/container.php` or wherever you add your service factories:
 
 ```php
-$container[\Odan\Csrf\CsrfMiddleware::class] = function () {
-    return new \Odan\Csrf\CsrfMiddleware(session_id());
+use Odan\Csrf\CsrfMiddleware;
+
+$container[CsrfMiddleware::class] = function () {
+    return new CsrfMiddleware(session_id());
 };
 ```
 
@@ -38,6 +40,8 @@ Add the middleware in `config/middleware.php`.
 $app->add(\Odan\Csrf\CsrfMiddleware::class);
 ```
 
+> Make sure that the PHP session is already started before invkoing the CSRF middleware.
+
 ### Using the Aura.Session token
 
 If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Session) library you can use their Session-ID and CSRF token.
@@ -45,10 +49,13 @@ If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Sess
 In your `config/container.php` or wherever you add your service factories:
 
 ```php
-$container[\Odan\Csrf\CsrfMiddleware::class] = function (Container $container) {
-    $session = $container->get(\Aura\Session\Session::class);
+use Aura\Session\Session;
+use Odan\Csrf\CsrfMiddleware;
+
+$container[CsrfMiddleware::class] = function (Container $container) {
+    $session = $container->get(Session::class);
     $token = $session->getCsrfToken()->getValue();
-    $csrf = new \Odan\Csrf\CsrfMiddleware($session->getId());
+    $csrf = new CsrfMiddleware($session->getId());
 
     // Use the token from the aura session object
     $csrf->setToken($token);
@@ -84,8 +91,10 @@ Sometimes you want a variable to be accessible to all the templates you use.
 This is possible inside your `config/container.php` file:
 
 ```php
-use Slim\Views\Twig;
 use Psr\Container\ContainerInterface as Container;
+use Slim\Http\Uri;
+use Slim\Views\Twig;
+use Slim\Views\TwigExtension;
 use Odan\Csrf\CsrfMiddleware;
 
 $container[Twig::class] = function (Container $container) {
@@ -99,8 +108,8 @@ $container[Twig::class] = function (Container $container) {
     
     // Add Slim specific extensions
     $router = $container->get('router');
-    $uri = \Slim\Http\Uri::createFromEnvironment($container->get('environment'));
-    $twig->addExtension(new \Slim\Views\TwigExtension($router, $uri));
+    $uri = Uri::createFromEnvironment($container->get('environment'));
+    $twig->addExtension(new TwigExtension($router, $uri));
 
     return $view;
 };
