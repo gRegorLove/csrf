@@ -26,10 +26,8 @@ composer require odan/csrf
 In your `config/container.php` or wherever you add your service factories:
 
 ```php
-$container[Odan\Csrf\CsrfMiddleware::class] = function (Container $container) {
-    // get the current session id
-    $sessionId = session_id();
-    return new Odan\Csrf\CsrfMiddleware($sessionId);
+$container[\Odan\Csrf\CsrfMiddleware::class] = function () {
+    return new \Odan\Csrf\CsrfMiddleware(session_id());
 };
 ```
 
@@ -37,11 +35,7 @@ Add the middleware in `config/middleware.php`.
 
 ```php
 // Csrf protection middleware
-$app->add(function (Request $request, Response $response, $next) {
-    /* @var \Slim\Container $this */
-    $csrf = $this->get(Odan\Csrf\CsrfMiddleware::class);
-    return $csrf->__invoke($request, $response, $next);
-});
+$app->add(\Odan\Csrf\CsrfMiddleware::class);
 ```
 
 ### Using the Aura.Session token
@@ -51,28 +45,16 @@ If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Sess
 In your `config/container.php` or wherever you add your service factories:
 
 ```php
-$container[Odan\Csrf\CsrfMiddleware::class] = function (Container $container) {
+$container[\Odan\Csrf\CsrfMiddleware::class] = function (Container $container) {
     $session = $container->get(\Aura\Session\Session::class);
     $token = $session->getCsrfToken()->getValue();
-    $sessionId = $session->getId();
-    $csrf = new \App\Middleware\CsrfMiddleware($sessionId);
+    $csrf = new \Odan\Csrf\CsrfMiddleware($session->getId());
 
     // Use the token from the aura session object
     $csrf->setToken($token);
     
     return $csrf;
 };
-```
-
-Add the middleware in `config/middleware.php`.
-
-```php
-// Csrf protection middleware
-$app->add(function (Request $request, Response $response, $next) {
-    /* @var \Slim\Container $this */
-    $csrf = $this->get(Odan\Csrf\CsrfMiddleware::class);
-    return $csrf->__invoke($request, $response, $next);
-});
 ```
 
 ## Options
@@ -102,18 +84,23 @@ Sometimes you want a variable to be accessible to all the templates you use.
 This is possible inside your `config/container.php` file:
 
 ```php
-$container['view'] = function ($c) {
-    $view = new \Slim\Views\Twig('path/to/templates', [
+use Slim\Views\Twig;
+use Psr\Container\ContainerInterface as Container;
+use Odan\Csrf\CsrfMiddleware;
+
+$container[Twig::class] = function (Container $container) {
+    $view = new Twig('path/to/templates', [
         'cache' => 'path/to/cache'
     ]);
     
     // Add a global twig variable
-    $csrfToken = $c->get(Odan\Csrf\CsrfMiddleware::class)->getToken();
+    $csrfToken = $container->get(CsrfMiddleware::class)->getToken();
     $view->getEnvironment()->addGlobal('csrf_token', $csrfToken);
     
-    // Instantiate and add Slim specific extension
-    $basePath = rtrim(str_ireplace('index.php', '', $c['request']->getUri()->getBasePath()), '/');
-    $view->addExtension(new \Slim\Views\TwigExtension($c['router'], $basePath));
+    // Add Slim specific extensions
+    $router = $container->get('router');
+    $uri = \Slim\Http\Uri::createFromEnvironment($container->get('environment'));
+    $twig->addExtension(new \Slim\Views\TwigExtension($router, $uri));
 
     return $view;
 };
