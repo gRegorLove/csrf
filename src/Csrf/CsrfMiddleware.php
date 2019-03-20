@@ -3,8 +3,8 @@
 namespace Odan\Csrf;
 
 use RuntimeException;
-use Slim\Http\Request;
-use Slim\Http\Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Http\Stream;
 
 /**
@@ -45,13 +45,11 @@ final class CsrfMiddleware
     /**
      * Constructor.
      *
-     * @param string|null $sessionId the session id
+     * @param string $sessionId the session id
      */
-    public function __construct(string $sessionId = null)
+    public function __construct(string $sessionId)
     {
-        if (!empty($sessionId)) {
-            $this->setSessionId($sessionId);
-        }
+        $this->setSessionId($sessionId);
     }
 
     /**
@@ -99,7 +97,7 @@ final class CsrfMiddleware
      *
      * @return void
      */
-    public function setTokenName(string $name)
+    public function setTokenName(string $name): void
     {
         $this->name = $name;
     }
@@ -176,7 +174,7 @@ final class CsrfMiddleware
      *
      * @return bool Success
      */
-    public function validate(Request $request, string $tokenValue): bool
+    private function validate(Request $request, string $tokenValue): bool
     {
         // Validate POST, PUT, DELETE, PATCH requests
         $method = $request->getMethod();
@@ -252,7 +250,7 @@ final class CsrfMiddleware
      *
      * @return string html
      */
-    public function injectFormHiddenFieldToResponse(string $body, string $tokenValue): string
+    private function injectFormHiddenFieldToResponse(string $body, string $tokenValue): string
     {
         $regex = '/(<form\b[^>]*>)(.*?)(<\/form>)/is';
         $htmlHiddenField = sprintf('$1<input type="hidden" name="%s" value="%s">$2$3', $this->name, $tokenValue);
@@ -269,7 +267,7 @@ final class CsrfMiddleware
      *
      * @return string html
      */
-    public function injectJqueryToResponse(string $body, string $tokenValue): string
+    private function injectJqueryToResponse(string $body, string $tokenValue): string
     {
         $regex = '/(.*?)(<\/body>)/is';
         $jQueryCode = sprintf(
