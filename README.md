@@ -24,11 +24,11 @@ composer require odan/csrf
 
 ## Using League/Route
 
-[League/Route](http://route.thephpleague.com) is a fast PSR-7 based routing and dispatch component including 
-PSR-15 middleware, built on top of FastRoute.
+[League/Route](http://route.thephpleague.com) is a fast PSR-7 based routing and dispatch 
+component including PSR-15 middleware, built on top of FastRoute.
 
 The following example assumes that [thephpleague/container](https://github.com/thephpleague/container) 
-is used as the PSR-11 container and [nyholm/psr7](https://github.com/Nyholm/psr7) as the PSR-7 / PSR-17 
+is used as the PSR-11 container and [nyholm/psr7](https://github.com/Nyholm/psr7) as the PSR-7/17 
 factory implementation:
 
 ```php
@@ -64,7 +64,7 @@ use League\Container\Container;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Odan\Csrf\CsrfMiddleware;
 
-$container = new Container();
+// ...
 
 $container->share(CsrfMiddleware::class, function (Container $container) {
     $session = $container->get(Session::class);
