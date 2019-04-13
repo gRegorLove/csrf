@@ -7,7 +7,8 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odan/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/odan/csrf.svg)](https://packagist.org/packages/odan/csrf)
 
-**Notice:** This package is intended for users of the Slim Framework BUT it has absolutely nothing to do with the Slim Framework.
+> **Notice:** The latest version of this package is not compatible with the Slim 3 framework. 
+> Please upgrade to Slim 4 or use League/Route.
 
 ## Requirements
 
@@ -19,49 +20,62 @@
 composer require odan/csrf
 ```
 
-## Integration
+## Usage
 
-### Register the middleware
+## Using League/Route
 
-In your `config/container.php` or wherever you add your service factories:
+[League/Route](http://route.thephpleague.com) is a fast PSR-7 based routing and dispatch component including 
+PSR-15 middleware, built on top of FastRoute.
+
+The following example assumes that [thephpleague/container](https://github.com/thephpleague/container) 
+is used as the PSR-11 container and [nyholm/psr7](https://github.com/Nyholm/psr7) as the PSR-7 / PSR-17 
+factory implementation:
 
 ```php
+use League\Container\Container;
+use League\Route\Router;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Odan\Csrf\CsrfMiddleware;
 
-$container[CsrfMiddleware::class] = function () {
-    return new CsrfMiddleware(session_id());
-};
+$container = new Container();
+
+// Register the container factory
+$container->share(CsrfMiddleware::class, function () {
+    return new CsrfMiddleware(new Psr17Factory(), session_id());
+});
+
+$router = new Router();
+$router->setContainer($container));
+
+// Add the middleware to the routes and route groups you want to protect
+$router->post('/contact', \App\Action\ContactSubmitAction::class)
+    ->middleware(CsrfMiddleware::class);
 ```
 
-Add the middleware to the routes and route groups you want to protect:
-
-```php
-// Csrf protection middleware
-$app->add(\Odan\Csrf\CsrfMiddleware::class);
-```
-
-> Make sure that the PHP session is already started before invkoing the CSRF middleware.
+> Make sure that the PHP session is already started before invoking the CSRF middleware.
 
 ### Using the Aura.Session token
 
 If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Session) library you can use their Session-ID and CSRF token.
 
-In your `config/container.php` or wherever you add your service factories:
-
 ```php
 use Aura\Session\Session;
+use League\Container\Container;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Odan\Csrf\CsrfMiddleware;
 
-$container[CsrfMiddleware::class] = function (Container $container) {
+$container = new Container();
+
+$container->share(CsrfMiddleware::class, function (Container $container) {
     $session = $container->get(Session::class);
     $token = $session->getCsrfToken()->getValue();
-    $csrf = new CsrfMiddleware($session->getId());
-
+    $csrf = new CsrfMiddleware(new Psr17Factory(), $session->getId());
+    
     // Use the token from the aura session object
     $csrf->setToken($token);
     
     return $csrf;
-};
+})->addArgument($container);
 ```
 
 ## Options
@@ -91,28 +105,23 @@ Sometimes you want a variable to be accessible to all the templates you use.
 This is possible inside your `config/container.php` file:
 
 ```php
-use Psr\Container\ContainerInterface as Container;
-use Slim\Http\Uri;
-use Slim\Views\Twig;
-use Slim\Views\TwigExtension;
+use League\Container\Container;
+use Twig\Environment as Twig;
+use Twig\Loader\FilesystemLoader;
 use Odan\Csrf\CsrfMiddleware;
 
-$container[Twig::class] = function (Container $container) {
-    $view = new Twig('path/to/templates', [
-        'cache' => 'path/to/cache'
-    ]);
-    
-    // Add a global twig variable
-    $csrfToken = $container->get(CsrfMiddleware::class)->getToken();
-    $view->getEnvironment()->addGlobal('csrf_token', $csrfToken);
-    
-    // Add Slim specific extensions
-    $router = $container->get('router');
-    $uri = Uri::createFromEnvironment($container->get('environment'));
-    $twig->addExtension(new TwigExtension($router, $uri));
+//...
 
-    return $view;
-};
+$container->share(Twig::class, function (Container $container) {
+    $loader = new FilesystemLoader('templates);
+    $twig = new Twig($loader);
+
+    // Add CSRF token as global template variable
+    $csrfToken = $container->get(CsrfMiddleware::class)->getToken();
+    $twig->addGlobal('csrf_token', $csrfToken);
+
+    return $twig;
+})->addArgument($container);
 ```
 
 Now, the variable `csrf_token` is available in all Twig templates:
@@ -241,7 +250,3 @@ You can disable automatic generation of anti-forgery tokens for HTML documents b
 ```php
 $csrf->protectjQueryAjax(false);
 ```
-
-## Similar packages
-
-* https://github.com/slimphp/Slim-Csrf
