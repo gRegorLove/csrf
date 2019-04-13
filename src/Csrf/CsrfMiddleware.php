@@ -2,16 +2,23 @@
 
 namespace Odan\Csrf;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
-use Slim\Http\Stream;
 
 /**
- * CSRF protection middleware.
+ * CSRF protection PSR-15 middleware.
  */
-final class CsrfMiddleware
+final class CsrfMiddleware implements MiddlewareInterface
 {
+    /**
+     * @var StreamFactoryInterface
+     */
+    private $streamFactory;
+
     /**
      * @var string
      */
@@ -45,11 +52,36 @@ final class CsrfMiddleware
     /**
      * Constructor.
      *
+     * @param StreamFactoryInterface $streamFactory
      * @param string $sessionId the session id
      */
-    public function __construct(string $sessionId)
+    public function __construct(StreamFactoryInterface $streamFactory, string $sessionId)
     {
+        $this->streamFactory = $streamFactory;
         $this->setSessionId($sessionId);
+    }
+
+    /**
+     * Invoke middleware.
+     *
+     * @param ServerRequestInterface $request The request
+     * @param RequestHandlerInterface $handler The handler
+     *
+     * @return ResponseInterface The response
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $tokenValue = $this->getToken();
+
+        $this->validate($request, $tokenValue);
+
+        // Attach Request Attributes
+        $request = $request->withAttribute('csrf_token', $tokenValue);
+
+        /* @var Response $response */
+        $response = $handler->handle($request);
+
+        return $this->injectTokenToResponse($response, $tokenValue);
     }
 
     /**
@@ -127,30 +159,6 @@ final class CsrfMiddleware
     }
 
     /**
-     * Invoke.
-     *
-     * @param Request $request the request
-     * @param Response $response the response
-     * @param callable $next next callback
-     *
-     * @return Response the response
-     */
-    public function __invoke(Request $request, Response $response, $next): Response
-    {
-        $tokenValue = $this->getToken();
-
-        $this->validate($request, $tokenValue);
-
-        // Attach Request Attributes
-        $request = $request->withAttribute('csrf_token', $tokenValue);
-
-        /* @var Response $response */
-        $response = $next($request, $response);
-
-        return $this->injectTokenToResponse($response, $tokenValue);
-    }
-
-    /**
      * Get CSRF token.
      *
      * @return string the token
@@ -167,14 +175,14 @@ final class CsrfMiddleware
     /**
      * Validate token.
      *
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $tokenValue tokenValue
      *
      * @throws RuntimeException If invalid token is given
      *
      * @return bool Success
      */
-    private function validate(Request $request, string $tokenValue): bool
+    private function validate(ServerRequestInterface $request, string $tokenValue): bool
     {
         // Validate POST, PUT, DELETE, PATCH requests
         $method = $request->getMethod();
@@ -204,14 +212,14 @@ final class CsrfMiddleware
     /**
      * Inject token to response object.
      *
-     * @param Response $response the response
+     * @param ResponseInterface $response the response
      * @param string $tokenValue token value
      *
      * @throws RuntimeException
      *
-     * @return Response the response
+     * @return ResponseInterface the response
      */
-    private function injectTokenToResponse(Response $response, string $tokenValue): Response
+    private function injectTokenToResponse(ResponseInterface $response, string $tokenValue): ResponseInterface
     {
         // Check if response is html
         $contentTypes = $response->getHeader('content-type');
@@ -230,16 +238,7 @@ final class CsrfMiddleware
             $content = $this->injectJqueryToResponse($content, $tokenValue);
         }
 
-        $stream = fopen('php://memory', 'r+');
-
-        if ($stream === false) {
-            throw new RuntimeException('Creating memory stream failed');
-        }
-
-        fwrite($stream, $content);
-        rewind($stream);
-
-        return $response->withBody(new Stream($stream));
+        return $response->withBody($this->streamFactory->createStream($content));
     }
 
     /**
