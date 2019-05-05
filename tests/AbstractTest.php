@@ -1,6 +1,6 @@
 <?php
 
-namespace Odan\Test;
+namespace Odan\Csrf\Test;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Odan\Csrf\CsrfMiddleware;
