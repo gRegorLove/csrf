@@ -7,8 +7,8 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odan/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/odan/csrf.svg)](https://packagist.org/packages/odan/csrf)
 
-> **Notice:** The latest version of this package is not compatible with the Slim 3 framework. 
-> Please upgrade to Slim 4 or use League/Route.
+> **Notice:** The latest version of this package is a PSR-15 middleware and not compatible with the Slim 3 framework. 
+> Please upgrade to Slim 4 or use [thephpleague/route](https://github.com/thephpleague/route).
 
 ## Requirements
 
@@ -24,7 +24,7 @@ composer require odan/csrf
 
 ## Using League/Route
 
-[League/Route](http://route.thephpleague.com) is a fast PSR-7 based routing and dispatch 
+[thephpleague/route](http://route.thephpleague.com) is a fast PSR-7 based routing and dispatch 
 component including PSR-15 middleware, built on top of FastRoute.
 
 The following example assumes that [thephpleague/container](https://github.com/thephpleague/container) 
