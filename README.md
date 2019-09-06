@@ -66,7 +66,7 @@ $container->share(CsrfMiddleware::class, static function (Container $container) 
 })->addArgument($container);
 ```
 
-2. Step: Register the middleware
+2. Step: Add the middleware
 
 ```php
 <?php
