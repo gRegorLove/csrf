@@ -3,9 +3,9 @@
 [![Latest Version on Packagist](https://img.shields.io/github/release/odan/csrf.svg)](https://github.com/odan/csrf/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
 [![Build Status](https://travis-ci.org/odan/csrf.svg?branch=master)](https://travis-ci.org/odan/csrf)
-[![Code Coverage](https://scrutinizer-ci.com/g/odan/csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/odan/csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/code-structure/master/code-coverage)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odan/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/?branch=master)
-[![Total Downloads](https://img.shields.io/packagist/dt/odan/csrf.svg)](https://packagist.org/packages/odan/csrf)
+[![Total Downloads](https://img.shields.io/packagist/dt/odan/csrf.svg)](https://packagist.org/packages/odan/csrf/stats)
 
 > **Notice:** The latest version of this package is a PSR-15 middleware and not compatible with the Slim 3 framework. 
 > Please upgrade to Slim 4 or use [thephpleague/route](https://github.com/thephpleague/route).
