@@ -28,6 +28,7 @@ is used as the PSR-11 container.
 1. Step: Register the middleware container entry
 
 ```php
+<?php
 
 use League\Container\Container;
 use Odan\Csrf\CsrfMiddleware;
@@ -68,6 +69,8 @@ $container->share(CsrfMiddleware::class, static function (Container $container) 
 2. Step: Register the middleware
 
 ```php
+<?php
+
 use Odan\Csrf\CsrfMiddleware;
 use Slim\Factory\AppFactory;
 
@@ -88,6 +91,8 @@ is used as the PSR-11 container and [nyholm/psr7](https://github.com/Nyholm/psr7
 factory implementation:
 
 ```php
+<?php
+
 use League\Container\Container;
 use League\Route\Router;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -113,6 +118,8 @@ $router->post('/contact', \App\Action\ContactSubmitAction::class)
 If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Session) library you can use their Session-ID and CSRF token.
 
 ```php
+<?php
+
 use Aura\Session\Session;
 use League\Container\Container;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -159,6 +166,8 @@ Sometimes you want a variable to be accessible to all the templates you use.
 This is possible inside your `config/container.php` file:
 
 ```php
+<?php
+
 use League\Container\Container;
 use Twig\Environment as Twig;
 use Twig\Loader\FilesystemLoader;
