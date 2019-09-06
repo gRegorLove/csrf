@@ -20,9 +20,65 @@
 composer require odan/csrf
 ```
 
-## Usage
+### Slim 4 integration
 
-## Using League/Route
+The following example assumes that [thephpleague/container](https://github.com/thephpleague/container) 
+is used as the PSR-11 container.
+
+1. Step: Register the middleware container entry
+
+```php
+
+use League\Container\Container;
+use Odan\Csrf\CsrfMiddleware;
+use Psr\Http\Message\StreamFactoryInterface;
+use Slim\Psr7\Factory\ResponseFactory;
+use Slim\Psr7\Factory\StreamFactory;
+
+$container = new Container();
+
+// ...
+
+// Register the stream factory container entry
+$container->share(StreamFactoryInterface::class, static function () {
+    return new StreamFactory();
+});
+
+// Register the middleware container entry
+$container->share(CsrfMiddleware::class, static function (Container $container) {
+    $responseFactory = $container->get(StreamFactoryInterface::class);
+
+    // Start session
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+
+    $sessionId = session_id();
+
+    $csrf = new CsrfMiddleware($responseFactory, $sessionId);
+
+    // Optional: Use the token from another source
+    // By default the token will be generated automatically.
+    //$csrf->setToken($token);
+
+    return $csrf;
+})->addArgument($container);
+```
+
+2. Step: Register the middleware
+
+```php
+use Odan\Csrf\CsrfMiddleware;
+use Slim\Factory\AppFactory;
+
+$app = AppFactory::create();
+
+// ...
+
+$app->add(CsrfMiddleware::class);
+```
+
+## thephpleague/route integration
 
 [thephpleague/route](http://route.thephpleague.com) is a fast PSR-7 based routing and dispatch 
 component including PSR-15 middleware, built on top of FastRoute.
@@ -51,8 +107,6 @@ $router->setContainer($container));
 $router->post('/contact', \App\Action\ContactSubmitAction::class)
     ->middleware(CsrfMiddleware::class);
 ```
-
-> Make sure that the PHP session is already started before invoking the CSRF middleware.
 
 ### Using the Aura.Session token
 
@@ -136,6 +190,12 @@ Now, the variable `csrf_token` is available in all Twig templates:
     </body>
 </html>
 ```
+
+## Known issues
+
+> CSRF middleware failed. SessionId not found!
+
+Make sure that the PHP session is already started before invoking the CSRF middleware.
 
 ## What attack does anti-forgery prevent?
 
