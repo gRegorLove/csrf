@@ -7,8 +7,11 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odan/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/odan/csrf.svg)](https://packagist.org/packages/odan/csrf/stats)
 
-> **Notice:** The latest version of this package is a PSR-15 middleware and not compatible with the Slim 3 framework. 
-> Please upgrade to Slim 4 or use [thephpleague/route](https://github.com/thephpleague/route).
+**Notice:** The latest version of this package is a PSR-15 middleware and not compatible with the Slim 3 framework. 
+Please upgrade to Slim 4 or use [thephpleague/route](https://github.com/thephpleague/route).
+
+**Important**: Since PHP 7.3+ it's possible to send [SameSite cookies](https://web.dev/samesite-cookies-explained). This makes CSRF obsolete.
+Further details can be found here: [SameSiteCookieMiddleware](https://gist.github.com/odan/87d16795f368c48757a1b08da5bd9899#file-samesitecookiemiddleware-php-L63)
 
 ## Requirements
 
