@@ -10,7 +10,7 @@
 **Upgrade Notice:** The latest version of this package is a PSR-15 middleware and not compatible with the Slim 3 framework. 
 Please upgrade to Slim 4 or use [thephpleague/route](https://github.com/thephpleague/route).
 
-**Important**: Since PHP 7.3+ it's possible to send [SameSite cookies](https://web.dev/samesite-cookies-explained). This makes CSRF prevention techniques obsolete. Further details can be found here: [SameSiteCookieMiddleware](https://gist.github.com/odan/87d16795f368c48757a1b08da5bd9899#file-samesitecookiemiddleware-php-L63)
+**Important**: Since PHP 7.3+ it's possible to send [SameSite cookies](https://web.dev/samesite-cookies-explained). This makes CSRF prevention techniques obsolete. Further details can be found here: [Sending SameSite cookies in PHP](https://gist.github.com/odan/87d16795f368c48757a1b08da5bd9899)
 
 ## Requirements
 
