@@ -24,48 +24,49 @@ composer require odan/csrf
 
 ### Slim 4 integration
 
-The following example assumes that [thephpleague/container](https://github.com/thephpleague/container) 
-is used as the PSR-11 container.
+For this example we use the [PHP-DI](http://php-di.org/) package.
 
 1. Step: Register the middleware container entry
 
 ```php
 <?php
 
-use League\Container\Container;
 use Odan\Csrf\CsrfMiddleware;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Slim\Psr7\Factory\ResponseFactory;
 use Slim\Psr7\Factory\StreamFactory;
 
-$container = new Container();
-
 // ...
 
-// Register the stream factory container entry
-$container->share(StreamFactoryInterface::class, static function () {
-    return new StreamFactory();
-});
+return [
+    // ...
 
-// Register the middleware container entry
-$container->share(CsrfMiddleware::class, static function (Container $container) {
-    $responseFactory = $container->get(StreamFactoryInterface::class);
+    // Register the stream factory container entry
+    StreamFactoryInterface::class => function (ContainerInterface $container) {
+         return new StreamFactory();
+    },
 
-    // Start session
-    if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start();
-    }
+    // Register the middleware container entry
+    CsrfMiddleware::class => function (ContainerInterface $container) {
+        $responseFactory = $container->get(StreamFactoryInterface::class);
 
-    $sessionId = session_id();
+        // Start session
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
 
-    $csrf = new CsrfMiddleware($responseFactory, $sessionId);
+        $sessionId = session_id();
 
-    // Optional: Use the token from another source
-    // By default the token will be generated automatically.
-    //$csrf->setToken($token);
+        $csrf = new CsrfMiddleware($responseFactory, $sessionId);
 
-    return $csrf;
-})->addArgument($container);
+         // Optional: Use the token from another source
+         // By default the token will be generated automatically.
+        //$csrf->setToken($token);
+
+        return $csrf;
+    },
+];
 ```
 
 2. Step: Add the middleware
