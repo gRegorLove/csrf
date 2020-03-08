@@ -17,9 +17,9 @@ abstract class AbstractTest extends TestCase
     /**
      * Factory.
      *
-     * @param mixed $sessionId
+     * @param mixed $sessionId The session id
      *
-     * @return CsrfMiddleware
+     * @return CsrfMiddleware The middleware
      */
     protected function newInstance($sessionId = 'sessionid'): CsrfMiddleware
     {
@@ -29,7 +29,7 @@ abstract class AbstractTest extends TestCase
     /**
      * Factory.
      *
-     * @return ServerRequestInterface
+     * @return ServerRequestInterface The request
      */
     protected function createRequest(): ServerRequestInterface
     {
@@ -39,7 +39,7 @@ abstract class AbstractTest extends TestCase
     /**
      * Factory.
      *
-     * @return ResponseInterface
+     * @return ResponseInterface The response
      */
     protected function createResponse(): ResponseInterface
     {
@@ -49,20 +49,32 @@ abstract class AbstractTest extends TestCase
     /**
      * Factory.
      *
-     * @param ResponseInterface $response
+     * @param ResponseInterface $response The response
      *
-     * @return RequestHandlerInterface
+     * @return RequestHandlerInterface The request handler
      */
     protected function createRequestHandler(ResponseInterface $response): RequestHandlerInterface
     {
-        return new class($response) implements RequestHandlerInterface {
+        return new class ($response) implements RequestHandlerInterface {
             private $response;
 
+            /**
+             * The constructor.
+             *
+             * @param ResponseInterface $response The response
+             */
             public function __construct(ResponseInterface $response)
             {
                 $this->response = $response;
             }
 
+            /**
+             * The handler.
+             *
+             * @param ServerRequestInterface $request The request
+             *
+             * @return ResponseInterface The response
+             */
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 return $this->response;

@@ -2,6 +2,8 @@
 
 namespace Odan\Csrf\Test;
 
+use RuntimeException;
+
 /**
  * AssetCacheTest.
  *
@@ -18,7 +20,7 @@ class CsrfMiddlewareTest extends AbstractTest
      */
     public function testInstanceError(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->newInstance()->setSessionId('');
     }
 
@@ -49,8 +51,10 @@ class CsrfMiddlewareTest extends AbstractTest
      */
     public function testProcessEmptyPost(): void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('CSRF middleware failed. Invalid CSRF token. This looks like a cross-site request forgery.');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'CSRF middleware failed. Invalid CSRF token. This looks like a cross-site request forgery.'
+        );
 
         $middleware = $this->newInstance();
         $request = $this->createRequest()->withMethod('POST');

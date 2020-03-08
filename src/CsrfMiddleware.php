@@ -50,10 +50,10 @@ final class CsrfMiddleware implements MiddlewareInterface
     private $protectJqueryAjax = true;
 
     /**
-     * Constructor.
+     * The constructor.
      *
-     * @param StreamFactoryInterface $streamFactory
-     * @param string $sessionId the session id
+     * @param StreamFactoryInterface $streamFactory The stream factory
+     * @param string $sessionId The session id
      */
     public function __construct(StreamFactoryInterface $streamFactory, string $sessionId)
     {
@@ -87,7 +87,7 @@ final class CsrfMiddleware implements MiddlewareInterface
     /**
      * Set session id.
      *
-     * @param string $sessionId the session id
+     * @param string $sessionId The session id
      */
     public function setSessionId(string $sessionId): void
     {
@@ -101,7 +101,7 @@ final class CsrfMiddleware implements MiddlewareInterface
     /**
      * Set salt.
      *
-     * @param string $salt the salt
+     * @param string $salt The salt
      *
      * @return void
      */
@@ -113,7 +113,7 @@ final class CsrfMiddleware implements MiddlewareInterface
     /**
      * Set token manually.
      *
-     * @param string $token
+     * @param string $token The token
      *
      * @return void
      */
@@ -125,7 +125,7 @@ final class CsrfMiddleware implements MiddlewareInterface
     /**
      * Set token name.
      *
-     * @param string $name
+     * @param string $name The name
      *
      * @return void
      */
@@ -137,7 +137,7 @@ final class CsrfMiddleware implements MiddlewareInterface
     /**
      * Enable automatic form protection.
      *
-     * @param bool $enabled
+     * @param bool $enabled Enable form protection
      *
      * @return void
      */
@@ -149,7 +149,7 @@ final class CsrfMiddleware implements MiddlewareInterface
     /**
      * Enable automatic jQuery ajax requests.
      *
-     * @param bool $enabled
+     * @param bool $enabled Enable jQuery ajax protection
      *
      * @return void
      */
@@ -161,7 +161,7 @@ final class CsrfMiddleware implements MiddlewareInterface
     /**
      * Get CSRF token.
      *
-     * @return string the token
+     * @return string The token
      */
     public function getToken(): string
     {
@@ -175,8 +175,8 @@ final class CsrfMiddleware implements MiddlewareInterface
     /**
      * Validate token.
      *
-     * @param ServerRequestInterface $request
-     * @param string $tokenValue tokenValue
+     * @param ServerRequestInterface $request The request
+     * @param string $tokenValue The token value
      *
      * @throws RuntimeException If invalid token is given
      *
@@ -203,7 +203,9 @@ final class CsrfMiddleware implements MiddlewareInterface
         }
 
         if ($requestCsrfToken !== $tokenValue) {
-            throw new RuntimeException('CSRF middleware failed. Invalid CSRF token. This looks like a cross-site request forgery.');
+            throw new RuntimeException(
+                'CSRF middleware failed. Invalid CSRF token. This looks like a cross-site request forgery.'
+            );
         }
 
         return true;
@@ -212,8 +214,8 @@ final class CsrfMiddleware implements MiddlewareInterface
     /**
      * Inject token to response object.
      *
-     * @param ResponseInterface $response the response
-     * @param string $tokenValue token value
+     * @param ResponseInterface $response The response
+     * @param string $tokenValue The token value
      *
      * @throws RuntimeException
      *
@@ -244,10 +246,10 @@ final class CsrfMiddleware implements MiddlewareInterface
     /**
      * Inject hidden field.
      *
-     * @param string $body body
-     * @param string $tokenValue token
+     * @param string $body The body
+     * @param string $tokenValue The token
      *
-     * @return string html
+     * @return string The html content
      */
     private function injectFormHiddenFieldToResponse(string $body, string $tokenValue): string
     {
@@ -261,16 +263,17 @@ final class CsrfMiddleware implements MiddlewareInterface
     /**
      * Inject jquery code.
      *
-     * @param string $body body data
-     * @param string $tokenValue token value
+     * @param string $body The body data
+     * @param string $tokenValue The token value
      *
-     * @return string html
+     * @return string The html content
      */
     private function injectJqueryToResponse(string $body, string $tokenValue): string
     {
         $regex = '/(.*?)(<\/body>)/is';
         $jQueryCode = sprintf(
-            '<script>$.ajaxSetup({beforeSend: function (xhr) { xhr.setRequestHeader("X-CSRF-Token","%s"); }});</script>',
+            '<script>$.ajaxSetup({beforeSend: function (xhr) ' .
+            '{ xhr.setRequestHeader("X-CSRF-Token","%s"); }});</script>',
             $tokenValue
         );
         $body = preg_replace($regex, '$1' . $jQueryCode . '$2', $body, -1, $count) ?? '';
