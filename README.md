@@ -1,14 +1,14 @@
 # A CSRF protection middleware
 
-[![Latest Version on Packagist](https://img.shields.io/github/release/selective/csrf.svg)](https://github.com/selective/csrf/releases)
+[![Latest Version on Packagist](https://img.shields.io/github/release/selective-php/csrf.svg)](https://github.com/selective-php/csrf/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
-[![Build Status](https://travis-ci.org/selective/csrf.svg?branch=master)](https://travis-ci.org/selective/csrf)
-[![Code Coverage](https://scrutinizer-ci.com/g/selective/csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/selective/csrf/code-structure/master/code-coverage)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/selective/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/selective/csrf/?branch=master)
-[![Total Downloads](https://img.shields.io/packagist/dt/selective/csrf.svg)](https://packagist.org/packages/selective/csrf/stats)
+[![Build Status](https://travis-ci.org/selective/csrf.svg?branch=master)](https://travis-ci.org/selective-php/csrf)
+[![Code Coverage](https://scrutinizer-ci.com/g/selective-php/csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/selective-php/csrf/code-structure/master/code-coverage)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/selective-php/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/selective-php/csrf/?branch=master)
+[![Total Downloads](https://img.shields.io/packagist/dt/selective-php/csrf.svg)](https://packagist.org/packages/selective/csrf/stats)
 
 **Upgrade Notice:** The latest version of this package is a PSR-15 middleware and not compatible with the Slim 3 framework. 
-Please upgrade to Slim 4 or use [thephpleague/route](https://github.com/thephpleague/route).
+Please upgrade to [Slim 4](https://www.slimframework.com/) or use [thephpleague/route](https://github.com/thephpleague/route).
 
 **Important**: Since PHP 7.3+ it's possible to send [SameSite cookies](https://web.dev/samesite-cookies-explained). This makes CSRF prevention techniques obsolete. Further details can be found here: [Sending SameSite cookies in PHP](https://gist.github.com/selective/87d16795f368c48757a1b08da5bd9899)
 
