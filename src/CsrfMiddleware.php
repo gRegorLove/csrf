@@ -2,12 +2,12 @@
 
 namespace Odan\Csrf;
 
+use Odan\Csrf\Exception\CsrfMiddlewareException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use RuntimeException;
 
 /**
  * CSRF protection PSR-15 middleware.
@@ -88,11 +88,15 @@ final class CsrfMiddleware implements MiddlewareInterface
      * Set session id.
      *
      * @param string $sessionId The session id
+     *
+     * @throws CsrfMiddlewareException
+     *
+     * @return void
      */
     public function setSessionId(string $sessionId): void
     {
         if (empty($sessionId)) {
-            throw new RuntimeException('CSRF middleware failed. SessionId not found!');
+            throw new CsrfMiddlewareException('CSRF middleware failed. SessionId not found!');
         }
 
         $this->sessionId = $sessionId;
@@ -178,7 +182,7 @@ final class CsrfMiddleware implements MiddlewareInterface
      * @param ServerRequestInterface $request The request
      * @param string $tokenValue The token value
      *
-     * @throws RuntimeException If invalid token is given
+     * @throws CsrfMiddlewareException If invalid token is given
      *
      * @return bool Success
      */
@@ -203,7 +207,7 @@ final class CsrfMiddleware implements MiddlewareInterface
         }
 
         if ($requestCsrfToken !== $tokenValue) {
-            throw new RuntimeException(
+            throw new CsrfMiddlewareException(
                 'CSRF middleware failed. Invalid CSRF token. This looks like a cross-site request forgery.'
             );
         }
@@ -216,8 +220,6 @@ final class CsrfMiddleware implements MiddlewareInterface
      *
      * @param ResponseInterface $response The response
      * @param string $tokenValue The token value
-     *
-     * @throws RuntimeException
      *
      * @return ResponseInterface the response
      */
