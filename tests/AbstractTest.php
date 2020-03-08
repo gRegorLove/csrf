@@ -56,6 +56,9 @@ abstract class AbstractTest extends TestCase
     protected function createRequestHandler(ResponseInterface $response): RequestHandlerInterface
     {
         return new class ($response) implements RequestHandlerInterface {
+            /**
+             * @var ResponseInterface The response
+             */
             private $response;
 
             /**

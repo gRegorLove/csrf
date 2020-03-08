@@ -190,7 +190,7 @@ final class CsrfMiddleware implements MiddlewareInterface
             return true;
         }
 
-        $postData = $request->getParsedBody();
+        $postData = (array)$request->getParsedBody();
 
         $requestCsrfToken = null;
         if (isset($postData[$this->name])) {
