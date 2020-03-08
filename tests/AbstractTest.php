@@ -1,9 +1,9 @@
 <?php
 
-namespace Odan\Csrf\Test;
+namespace Selective\Csrf\Test;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
-use Odan\Csrf\CsrfMiddleware;
+use Selective\Csrf\CsrfMiddleware;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

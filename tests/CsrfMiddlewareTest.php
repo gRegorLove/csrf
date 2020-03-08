@@ -1,13 +1,13 @@
 <?php
 
-namespace Odan\Csrf\Test;
+namespace Selective\Csrf\Test;
 
 use RuntimeException;
 
 /**
  * AssetCacheTest.
  *
- * @coversDefaultClass \Odan\Csrf\CsrfMiddleware
+ * @coversDefaultClass \Selective\Csrf\CsrfMiddleware
  */
 class CsrfMiddlewareTest extends AbstractTest
 {

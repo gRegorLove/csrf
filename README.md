@@ -1,16 +1,16 @@
 # A CSRF protection middleware
 
-[![Latest Version on Packagist](https://img.shields.io/github/release/odan/csrf.svg)](https://github.com/odan/csrf/releases)
+[![Latest Version on Packagist](https://img.shields.io/github/release/selective/csrf.svg)](https://github.com/selective/csrf/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
-[![Build Status](https://travis-ci.org/odan/csrf.svg?branch=master)](https://travis-ci.org/odan/csrf)
-[![Code Coverage](https://scrutinizer-ci.com/g/odan/csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/code-structure/master/code-coverage)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odan/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odan/csrf/?branch=master)
-[![Total Downloads](https://img.shields.io/packagist/dt/odan/csrf.svg)](https://packagist.org/packages/odan/csrf/stats)
+[![Build Status](https://travis-ci.org/selective/csrf.svg?branch=master)](https://travis-ci.org/selective/csrf)
+[![Code Coverage](https://scrutinizer-ci.com/g/selective/csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/selective/csrf/code-structure/master/code-coverage)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/selective/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/selective/csrf/?branch=master)
+[![Total Downloads](https://img.shields.io/packagist/dt/selective/csrf.svg)](https://packagist.org/packages/selective/csrf/stats)
 
 **Upgrade Notice:** The latest version of this package is a PSR-15 middleware and not compatible with the Slim 3 framework. 
 Please upgrade to Slim 4 or use [thephpleague/route](https://github.com/thephpleague/route).
 
-**Important**: Since PHP 7.3+ it's possible to send [SameSite cookies](https://web.dev/samesite-cookies-explained). This makes CSRF prevention techniques obsolete. Further details can be found here: [Sending SameSite cookies in PHP](https://gist.github.com/odan/87d16795f368c48757a1b08da5bd9899)
+**Important**: Since PHP 7.3+ it's possible to send [SameSite cookies](https://web.dev/samesite-cookies-explained). This makes CSRF prevention techniques obsolete. Further details can be found here: [Sending SameSite cookies in PHP](https://gist.github.com/selective/87d16795f368c48757a1b08da5bd9899)
 
 ## Requirements
 
@@ -19,7 +19,7 @@ Please upgrade to Slim 4 or use [thephpleague/route](https://github.com/thephple
 ## Installation
 
 ```
-composer require odan/csrf
+composer require selective/csrf
 ```
 
 ### Slim 4 integration
@@ -31,7 +31,7 @@ For this example we use the [PHP-DI](http://php-di.org/) package.
 ```php
 <?php
 
-use Odan\Csrf\CsrfMiddleware;
+use Selective\Csrf\CsrfMiddleware;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Slim\Psr7\Factory\ResponseFactory;
@@ -74,7 +74,7 @@ return [
 ```php
 <?php
 
-use Odan\Csrf\CsrfMiddleware;
+use Selective\Csrf\CsrfMiddleware;
 use Slim\Factory\AppFactory;
 
 $app = AppFactory::create();
@@ -99,7 +99,7 @@ factory implementation:
 use League\Container\Container;
 use League\Route\Router;
 use Nyholm\Psr7\Factory\Psr17Factory;
-use Odan\Csrf\CsrfMiddleware;
+use Selective\Csrf\CsrfMiddleware;
 
 $container = new Container();
 
@@ -126,7 +126,7 @@ If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Sess
 use Aura\Session\Session;
 use League\Container\Container;
 use Nyholm\Psr7\Factory\Psr17Factory;
-use Odan\Csrf\CsrfMiddleware;
+use Selective\Csrf\CsrfMiddleware;
 
 // ...
 
@@ -174,7 +174,7 @@ This is possible inside your `config/container.php` file:
 use League\Container\Container;
 use Twig\Environment as Twig;
 use Twig\Loader\FilesystemLoader;
-use Odan\Csrf\CsrfMiddleware;
+use Selective\Csrf\CsrfMiddleware;
 
 //...
 
@@ -253,7 +253,7 @@ More informations:
 * [Robust Defenses for Cross-Site Request Forgery](http://seclab.stanford.edu/websec/csrf/csrf.pdf) (pdf)
 * [Preventing Cross-Site Request Forgery (XSRF/CSRF) Attacks](https://docs.microsoft.com/en-us/aspnet/core/security/anti-request-forgery)
 
-## How does odan/csrf address CSRF?
+## How does selective/csrf address CSRF?
 
 ### HTML forms
 

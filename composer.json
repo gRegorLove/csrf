@@ -1,19 +1,13 @@
 {
-    "name": "odan/csrf",
+    "name": "selective/csrf",
     "type": "library",
     "description": "A CSRF protection middleware",
     "keywords": [
         "csrf",
         "anti forgery"
     ],
-    "homepage": "https://github.com/odan/csrf",
+    "homepage": "https://github.com/selective/csrf",
     "license": "MIT",
-    "authors": [
-        {
-            "name": "odan",
-            "homepage": "https://github.com/odan"
-        }
-    ],
     "require": {
         "php": "^7.1",
         "psr/http-factory": "^1.0",
@@ -46,12 +40,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Odan\\Csrf\\": "src"
+            "Selective\\Csrf\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Odan\\Csrf\\Test\\": "tests"
+            "Selective\\Csrf\\Test\\": "tests"
         }
     },
     "config": {

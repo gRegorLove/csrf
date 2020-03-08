@@ -1,8 +1,8 @@
 <?php
 
-namespace Odan\Csrf;
+namespace Selective\Csrf;
 
-use Odan\Csrf\Exception\CsrfMiddlewareException;
+use Selective\Csrf\Exception\CsrfMiddlewareException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;

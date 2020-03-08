@@ -1,6 +1,6 @@
 <?php
 
-namespace Odan\Csrf\Exception;
+namespace Selective\Csrf\Exception;
 
 use RuntimeException;
 
