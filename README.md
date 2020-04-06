@@ -2,7 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/github/release/selective-php/csrf.svg)](https://github.com/selective-php/csrf/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
-[![Build Status](https://travis-ci.org/selective-php/csrf.svg?branch=master)](https://travis-ci.org/selective-php/csrf)
+[![Build Status](https://github.com/selective-php/csrf/workflows/PHP/badge.svg)](https://github.com/selective-php/csrf/actions)
 [![Code Coverage](https://scrutinizer-ci.com/g/selective-php/csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/selective-php/csrf/code-structure/master/code-coverage)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/selective-php/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/selective-php/csrf/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/selective-php/csrf.svg)](https://packagist.org/packages/selective/csrf/stats)
