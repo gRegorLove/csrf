@@ -95,4 +95,88 @@ class CsrfMiddlewareTest extends AbstractTest
 
         $this->assertSame($expected, $content);
     }
+
+    /**
+     * Test.
+     *
+     * @return void
+     */
+    public function testProcessOnSetSaltWithValidPost(): void
+    {
+        $middleware = $this->newInstance();
+        $middleware->protectForms(true);
+        $middleware->protectJqueryAjax(true);
+        $middleware->setSalt('THIS_IS_A_SALT');
+        $token = $middleware->getToken();
+
+        $request = $this->createRequest()->withMethod('POST')->withHeader('X-CSRF-Token', $token);
+        $response = $this->createResponse()->withHeader('Content-Type', 'text/html');
+
+        $response->getBody()->write('<form></form>');
+        $response = $middleware->process($request, $this->createRequestHandler($response));
+
+        $content = (string)$response->getBody();
+
+        $expected = sprintf('<form><input type="hidden" name="__token" value="%s"></form>' .
+            '<script>$.ajaxSetup({beforeSend: function (xhr) { xhr.setRequestHeader("X-CSRF-Token","%s"); }});' .
+            '</script>', $token, $token);
+
+        $this->assertSame($expected, $content);
+    }
+
+    /**
+     * Test.
+     *
+     * @return void
+     */
+    public function testProcessOnSetTokenWithValidPost(): void
+    {
+        $middleware = $this->newInstance();
+        $middleware->protectForms(true);
+        $middleware->protectJqueryAjax(true);
+        $middleware->setToken('THIS_IS_A_SPECIFIC_TOKEN');
+        $token = $middleware->getToken();
+
+        $request = $this->createRequest()->withMethod('POST')->withHeader('X-CSRF-Token', $token);
+        $response = $this->createResponse()->withHeader('Content-Type', 'text/html');
+
+        $response->getBody()->write('<form></form>');
+        $response = $middleware->process($request, $this->createRequestHandler($response));
+
+        $content = (string)$response->getBody();
+
+        $expected = sprintf('<form><input type="hidden" name="__token" value="%s"></form>' .
+            '<script>$.ajaxSetup({beforeSend: function (xhr) { xhr.setRequestHeader("X-CSRF-Token","%s"); }});' .
+            '</script>', $token, $token);
+
+        $this->assertSame($expected, $content);
+    }
+
+    /**
+     * Test.
+     *
+     * @return void
+     */
+    public function testProcessOnSetTokenNameWithValidPost(): void
+    {
+        $middleware = $this->newInstance();
+        $middleware->protectForms(true);
+        $middleware->protectJqueryAjax(true);
+        $middleware->setTokenName('THIS_IS_A_SPECIFIC_TOKEN_NAME');
+        $token = $middleware->getToken();
+
+        $request = $this->createRequest()->withMethod('POST')->withHeader('X-CSRF-Token', $token);
+        $response = $this->createResponse()->withHeader('Content-Type', 'text/html');
+
+        $response->getBody()->write('<form></form>');
+        $response = $middleware->process($request, $this->createRequestHandler($response));
+
+        $content = (string)$response->getBody();
+
+        $expected = sprintf('<form><input type="hidden" name="THIS_IS_A_SPECIFIC_TOKEN_NAME" value="%s"></form>' .
+            '<script>$.ajaxSetup({beforeSend: function (xhr) { xhr.setRequestHeader("X-CSRF-Token","%s"); }});' .
+            '</script>', $token, $token);
+
+        $this->assertSame($expected, $content);
+    }
 }
