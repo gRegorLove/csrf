@@ -2,7 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/github/release/selective-php/csrf.svg)](https://github.com/selective-php/csrf/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
-[![Build Status](https://github.com/selective-php/csrf/workflows/PHP/badge.svg)](https://github.com/selective-php/csrf/actions)
+[![Build Status](https://github.com/selective-php/csrf/workflows/build/badge.svg)](https://github.com/selective-php/csrf/actions)
 [![Code Coverage](https://scrutinizer-ci.com/g/selective-php/csrf/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/selective-php/csrf/code-structure/master/code-coverage)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/selective-php/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/selective-php/csrf/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/selective-php/csrf.svg)](https://packagist.org/packages/selective/csrf/stats)
@@ -23,8 +23,6 @@ composer require selective/csrf
 ```
 
 ### Slim 4 integration
-
-For this example we use the [PHP-DI](http://php-di.org/) package.
 
 1. Step: Register the middleware container entry
 
@@ -60,8 +58,8 @@ return [
 
         $csrf = new CsrfMiddleware($responseFactory, $sessionId);
 
-         // Optional: Use the token from another source
-         // By default the token will be generated automatically.
+        // Optional: Use the token from another source
+        // By default the token will be generated automatically.
         //$csrf->setToken($token);
 
         return $csrf;
@@ -118,7 +116,8 @@ $router->post('/contact', \App\Action\ContactSubmitAction::class)
 
 ### Using the Aura.Session token
 
-If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Session) library you can use their Session-ID and CSRF token.
+If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Session) 
+library you can use their Session-ID and CSRF token.
 
 ```php
 <?php
@@ -179,7 +178,7 @@ use Selective\Csrf\CsrfMiddleware;
 //...
 
 $container->share(Twig::class, function (Container $container) {
-    $loader = new FilesystemLoader('templates);
+    $loader = new FilesystemLoader('templates');
     $twig = new Twig($loader);
 
     // Add CSRF token as global template variable
