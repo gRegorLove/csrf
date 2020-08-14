@@ -53,12 +53,12 @@ final class CsrfMiddleware implements MiddlewareInterface
      * The constructor.
      *
      * @param StreamFactoryInterface $streamFactory The stream factory
-     * @param string $sessionId The session id
+     * @param string $salt The salt
      */
-    public function __construct(StreamFactoryInterface $streamFactory, string $sessionId)
+    public function __construct(StreamFactoryInterface $streamFactory, string $salt)
     {
         $this->streamFactory = $streamFactory;
-        $this->setSessionId($sessionId);
+        $this->setSalt($salt);
     }
 
     /**
@@ -111,6 +111,9 @@ final class CsrfMiddleware implements MiddlewareInterface
      */
     public function setSalt(string $salt): void
     {
+        if (empty($salt)) {
+            throw new CsrfMiddlewareException('CSRF middleware failed. Token must not be empty!');
+        }
         $this->salt = $salt;
     }
 
