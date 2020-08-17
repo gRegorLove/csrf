@@ -74,15 +74,17 @@ $app = AppFactory::create();
 
 // ...
 
-$app->add(CsrfMiddleware::class);
+$app->add(CsrfMiddleware::class); // <--- here
 
-// Session starter middleware
+// Optional: Session starter middleware
 $app->add(function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
     if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
     }
     return $handler->handle($request);
 });
+
+// ...
 ```
 
 ### Using the Aura.Session token
@@ -123,6 +125,9 @@ return [
         // Get Aura session instance
         $session = $container->get(Session::class);
     
+        // Use the session from the aura session object
+        $csrf->setSessionId($session->getId());
+
         // Use the token from the aura session object
         $csrf->setToken($session->getCsrfToken()->getValue();
     
