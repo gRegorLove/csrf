@@ -65,6 +65,8 @@ return [
 ```php
 <?php
 
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Selective\Csrf\CsrfMiddleware;
 use Slim\Factory\AppFactory;
 
@@ -73,6 +75,14 @@ $app = AppFactory::create();
 // ...
 
 $app->add(CsrfMiddleware::class);
+
+// Session starter middleware
+$app->add(function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+    return $handler->handle($request);
+});
 ```
 
 ### Using the Aura.Session token
