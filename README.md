@@ -7,9 +7,6 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/selective-php/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/selective-php/csrf/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/selective-php/csrf.svg)](https://packagist.org/packages/selective/csrf/stats)
 
-**Upgrade Notice:** The latest version of this package is a PSR-15 middleware and not compatible with the Slim 3 framework.
-Please upgrade to [Slim 4](https://www.slimframework.com/).
-
 **Important**: Since PHP 7.3+ it's possible to send [SameSite cookies](https://web.dev/samesite-cookies-explained). This makes CSRF prevention techniques obsolete. Further details can be found here: [Sending SameSite cookies in PHP](https://gist.github.com/selective/87d16795f368c48757a1b08da5bd9899)
 
 ## Requirements
@@ -47,20 +44,16 @@ return [
 
     // Register the middleware container entry
     CsrfMiddleware::class => function (ContainerInterface $container) {
-        $responseFactory = $container->get(StreamFactoryInterface::class);
+        $streamFactory = $container->get(StreamFactoryInterface::class);
 
-        // Start session
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
+        // Get salt from settings
+        $salt = $container->get('settings')['session']['salt'];
 
-        $salt = random_bytes(16); // salt should be required and not empty
+        $csrf = new CsrfMiddleware($streamFactory, $salt);
 
-        $csrf = new CsrfMiddleware($responseFactory, $salt);
-
-        // Optional: Use the token from another source
-        // By default the token will be generated automatically.
-        //$csrf->setToken($token);
+        // Set session id
+        // The session must be started before you can get the session id
+        $csrf->setSessionId(session_id());
 
         return $csrf;
     },
@@ -82,39 +75,6 @@ $app = AppFactory::create();
 $app->add(CsrfMiddleware::class);
 ```
 
-## thephpleague/route integration
-
-[thephpleague/route](http://route.thephpleague.com) is a fast PSR-7 based routing and dispatch
-component including PSR-15 middleware, built on top of FastRoute.
-
-The following example assumes that [thephpleague/container](https://github.com/thephpleague/container)
-is used as the PSR-11 container and [nyholm/psr7](https://github.com/Nyholm/psr7) as the PSR-7/17
-factory implementation:
-
-```php
-<?php
-
-use League\Container\Container;
-use League\Route\Router;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Selective\Csrf\CsrfMiddleware;
-
-$container = new Container();
-
-// Register the container factory
-$container->share(CsrfMiddleware::class, function () {
-    $salt = random_bytes(16); // salt should be required and not empty
-    return new CsrfMiddleware(new Psr17Factory(), $salt);
-});
-
-$router = new Router();
-$router->setContainer($container));
-
-// Add the middleware to the routes and route groups you want to protect
-$router->post('/contact', \App\Action\ContactSubmitAction::class)
-    ->middleware(CsrfMiddleware::class);
-```
-
 ### Using the Aura.Session token
 
 If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Session)
@@ -124,22 +84,41 @@ library you can use their Session-ID and CSRF token.
 <?php
 
 use Aura\Session\Session;
-use League\Container\Container;
-use Nyholm\Psr7\Factory\Psr17Factory;
+use Aura\Session\SessionFactory;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Selective\Csrf\CsrfMiddleware;
+use Slim\Psr7\Factory\StreamFactory;
 
 // ...
 
-$container->share(CsrfMiddleware::class, function (Container $container) {
-    $salt = random_bytes(16); // salt should be required and not empty
-    $token = $session->getCsrfToken()->getValue();
-    $csrf = new CsrfMiddleware(new Psr17Factory(), $session->getId());
+return [
+    // ...
+    StreamFactoryInterface::class => function () {
+         return new StreamFactory();
+    },
 
-    // Use the token from the aura session object
-    $csrf->setToken($token);
+    Session::class => function () {
+        return (new SessionFactory())->newInstance($_COOKIE);
+    }
 
-    return $csrf;
-})->addArgument($container);
+    CsrfMiddleware::class => function (ContainerInterface $container) {
+        $streamFactory = $container->get(StreamFactoryInterface::class);
+
+        // Get salt from settings
+        $salt = $container->get('settings')['session']['salt'];
+    
+        $csrf = new CsrfMiddleware($streamFactory, $salt);
+        
+        // Get Aura session instance
+        $session = $container->get(Session::class);
+    
+        // Use the token from the aura session object
+        $csrf->setToken($session->getCsrfToken()->getValue();
+    
+        return $csrf;
+    }
+];
 ```
 
 ## Options
@@ -147,7 +126,10 @@ $container->share(CsrfMiddleware::class, function (Container $container) {
 For security reasons all security related settings are enabled by default.
 
 ```php
-// Set a secret password to increase the security of the token
+// Set session id from the request
+$csrf->setSessionId('...');
+
+// Set a secret salt to increase the security of the token
 $csrf->setSalt('secret');
 
 // Change the name of the hidden input field
@@ -322,3 +304,7 @@ You can disable automatic generation of anti-forgery tokens for HTML documents b
 ```php
 $csrf->protectjQueryAjax(false);
 ```
+
+### Similar libraries
+
+* https://github.com/slimphp/Slim-Csrf
