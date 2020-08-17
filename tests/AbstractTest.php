@@ -17,13 +17,13 @@ abstract class AbstractTest extends TestCase
     /**
      * Factory.
      *
-     * @param mixed $sessionId The session id
+     * @param mixed $salt The salt
      *
      * @return CsrfMiddleware The middleware
      */
-    protected function newInstance($sessionId = 'sessionid'): CsrfMiddleware
+    protected function newInstance($salt = 'salt'): CsrfMiddleware
     {
-        return new CsrfMiddleware(new Psr17Factory(), $sessionId);
+        return new CsrfMiddleware(new Psr17Factory(), $salt);
     }
 
     /**

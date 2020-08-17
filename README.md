@@ -7,7 +7,7 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/selective-php/csrf/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/selective-php/csrf/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/selective-php/csrf.svg)](https://packagist.org/packages/selective/csrf/stats)
 
-**Upgrade Notice:** The latest version of this package is a PSR-15 middleware and not compatible with the Slim 3 framework. 
+**Upgrade Notice:** The latest version of this package is a PSR-15 middleware and not compatible with the Slim 3 framework.
 Please upgrade to [Slim 4](https://www.slimframework.com/).
 
 **Important**: Since PHP 7.3+ it's possible to send [SameSite cookies](https://web.dev/samesite-cookies-explained). This makes CSRF prevention techniques obsolete. Further details can be found here: [Sending SameSite cookies in PHP](https://gist.github.com/selective/87d16795f368c48757a1b08da5bd9899)
@@ -54,9 +54,9 @@ return [
             session_start();
         }
 
-        $sessionId = session_id();
+        $salt = random_bytes(16); // salt should be required and not empty
 
-        $csrf = new CsrfMiddleware($responseFactory, $sessionId);
+        $csrf = new CsrfMiddleware($responseFactory, $salt);
 
         // Optional: Use the token from another source
         // By default the token will be generated automatically.
@@ -84,11 +84,11 @@ $app->add(CsrfMiddleware::class);
 
 ## thephpleague/route integration
 
-[thephpleague/route](http://route.thephpleague.com) is a fast PSR-7 based routing and dispatch 
+[thephpleague/route](http://route.thephpleague.com) is a fast PSR-7 based routing and dispatch
 component including PSR-15 middleware, built on top of FastRoute.
 
-The following example assumes that [thephpleague/container](https://github.com/thephpleague/container) 
-is used as the PSR-11 container and [nyholm/psr7](https://github.com/Nyholm/psr7) as the PSR-7/17 
+The following example assumes that [thephpleague/container](https://github.com/thephpleague/container)
+is used as the PSR-11 container and [nyholm/psr7](https://github.com/Nyholm/psr7) as the PSR-7/17
 factory implementation:
 
 ```php
@@ -103,7 +103,8 @@ $container = new Container();
 
 // Register the container factory
 $container->share(CsrfMiddleware::class, function () {
-    return new CsrfMiddleware(new Psr17Factory(), session_id());
+    $salt = random_bytes(16); // salt should be required and not empty
+    return new CsrfMiddleware(new Psr17Factory(), $salt);
 });
 
 $router = new Router();
@@ -116,7 +117,7 @@ $router->post('/contact', \App\Action\ContactSubmitAction::class)
 
 ### Using the Aura.Session token
 
-If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Session) 
+If you are already using the [Aura.Session](https://github.com/auraphp/Aura.Session)
 library you can use their Session-ID and CSRF token.
 
 ```php
@@ -130,13 +131,13 @@ use Selective\Csrf\CsrfMiddleware;
 // ...
 
 $container->share(CsrfMiddleware::class, function (Container $container) {
-    $session = $container->get(Session::class);
+    $salt = random_bytes(16); // salt should be required and not empty
     $token = $session->getCsrfToken()->getValue();
     $csrf = new CsrfMiddleware(new Psr17Factory(), $session->getId());
-    
+
     // Use the token from the aura session object
     $csrf->setToken($token);
-    
+
     return $csrf;
 })->addArgument($container);
 ```
@@ -164,7 +165,7 @@ $csrf->protectForms(true, false);
 
 ## Rendering the CSRF field in Twig
 
-Sometimes you want a variable to be accessible to all the templates you use. 
+Sometimes you want a variable to be accessible to all the templates you use.
 This is possible inside your `config/container.php` file:
 
 ```php
@@ -227,7 +228,7 @@ An example of a CSRF attack:
     <input type="submit" value="Click Me"/>
 </form>
  ```
- 
+
 Notice that the form action posts to the vulnerable site, not to the malicious site. This is the “cross-site” part of CSRF.
 
 The user clicks the submit button. The browser includes the authentication cookie with the request. The request runs on the server with the user’s authentication context, and can do anything that an authenticated user is allowed to do.
